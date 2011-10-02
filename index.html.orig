@@ -1,0 +1,199 @@
+<html>
+  <head>
+    <title>Todd's Lectionary</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.css" />
+    <script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/lectionary.css">	
+    <link rel="stylesheet" type="text/css" href="http://www.gnpcb.org/esv/assets/style/text.css" />
+
+    <script type="text/javascript" src="lib/lectionary/lectionary.js" /></script>	
+    <script type="text/javascript">
+        function main() {
+            var date = new Date();
+            var lectionary = new Lectionary(date);
+            display("ReadingsDate", "Readings for " + date.toDateString());
+    display("Summary", "<strong>Summary:</strong> " + lectionary.psalms() + ", " + lectionary.gospel() + ", " + lectionary.proverbs());
+            displayEsv("PsMorning", lectionary.psalmsAm());
+            displayEsv("PsNoon", lectionary.psalmsNoon());
+            displayEsv("PsEvening", lectionary.psalmsPm());
+            displayEsv("Gospel", lectionary.gospel());
+            displayEsv("Proverbs", lectionary.proverbs());
+        }
+
+        function display(id, content) {
+                var node = document.getElementById(id);
+                node.innerHTML = content;
+        }
+
+        function debug(content) {
+            var node = document.getElementById("Debug");
+            node.appendChild(document.createTextNode(content));
+        }
+
+        function displayEsv(destinationDiv, passage) {
+            // TODO
+            // - ESV presently unavailable through biblia. Require ESV service
+            // - Cross-site can be circumvented by a webservice that takes callbacks
+            // - see SO re: esv jsonp callback
+            // - need boidem's service to support callback -- then I should be able to use it from local .html?
+
+            passage = passage.replace(" ", "+");
+            // var myUrl = "http://www.boidem.org/cgi/esv/passageQuery.py?include-verse-numbers=0&include-first-verse-numbers=0&include-footnotes=0&include-surrounding-chapters=0&audio-format=mp3&include-headings=false&passage=" + passage;
+            callbackName = "callbackESV" + passage + (new Date()).valueOf();
+            var myUrl = "http://www.boidem.org/cgi/esv/passageQuery2.py"
+              + "?include-verse-numbers=0"
+              + "&include-first-verse-numbers=0"
+              + "&include-footnotes=0"
+              + "&include-surrounding-chapters=0"
+              + "&audio-format=mp3"
+              + "&include-headings=false"
+              + "&callback=" + callbackName
+              + "&passage=" + passage;
+            window[callbackName] = function(text) {
+              display(destinationDiv, text);
+            };
+          $.getJSON(myUrl, callbackName);
+        }
+
+        window.onload=main;
+
+    </script>
+
+  </head>
+  <body>
+    <div data-role="page" id="home">
+      <div data-role="header">
+        <h1>Todd's Lectionary</h1>
+      </div>
+      <div data-role="content">
+        <h3 id="ReadingsDate"></h3>
+        <div id="Summary"></div>
+        <ul data-role="listview" data-inset="true">
+          <li><a href="#psmorningPage">Morning Psalms</a></li>
+          <li><a href="#psnoonPage">Noon Psalms</a></li>
+          <li><a href="#pseveningPage">Evening Psalms</a></li>
+          <li><a href="#gospelPage">Gospel</a></li>
+          <li><a href="#proverbsPage">Proverbs</a></li>
+          <li><a href="#aboutPage">About</a></li>
+          <li><a href="#notesPage">Notes</a></li>
+        </ul>
+      </div>
+      <div data-role="footer">
+        <p>
+        Scripture taken from The Holy Bible, English Standard Version. Copyright &copy;2001 by <a href="http://www.crosswaybibles.org">Crossway Bibles</a>, a publishing ministry of Good News Publishers. Used by permission. All rights reserved. Text provided by the <a href="http://www.gnpcb.org/esv/share/services/">Crossway Bibles Web Service</a>.
+        <p>Page copyright &copy;2011 by Todd Foster. Last update on 29 January 2011.</p>
+      </div>
+    </div>
+
+    
+    <div data-role="page" id="aboutPage">
+      <div data-role="header">
+        <h1>About this app</h1>
+      </div>
+      <div data-role="content">
+			<p>Psalms reading plan adapted from Rabbi Menachem Davis, ed.,
+			<em>Tehillim</em> (<a href="http://artscroll.com/">Mesorah 
+				Publications, Ltd.</a>: 2001).
+			</p>
+			<p>Kudos to <a href="http://www.crossway.org/home/esv/">Crossway 
+				Bibles</a> for providing a simple, easy and free
+				<a href="http://www.esvapi.org/">Javascript API</a> to their Bible.
+				I also very much like their 
+				<a href="http://www.gnpcb.org/esv/mobile/">clean mobile interface</a>
+				(e.g., <a href="http://www.gnpcb.org/esv/mobile/?q=Ps+130">Ps 130</a>).
+			</p>
+			<form action="http://www.gnpcb.org/esv/search/" id="esvsearchform" method="get">
+				<label for="esvinput">Search the ESV Bible</label>
+				<input type="text" name="q" id="esvinput" size="20" maxlength="255" />
+				<input type="submit" name="go" id="esvsearchbutton" value="Search" />
+			</form>
+
+            <p>If you don't mind a little heavier interface, <a href="http://www.logos.com">my
+              employer</a> provides <a href="http://biblia.com">a more comprehensive
+              tool</a>: be sure to click on the "View: mobile" link at the bottom 
+              for a nice clean interface (my preference!).
+              </p>
+          
+      </div>
+    </div>
+
+    <div data-role="page" id="notesPage">
+      <div data-role="header">
+        <h1>Notes/Todo</h1>
+      </div>
+      <div data-role="content">
+        <p> Some ideas:</p>
+        <ul>
+          <li>Folder tabs instead of collapsing div's?</li>
+          <li>Add check-boxes to toggle options sent to esvapi</li>
+          <li>Weekly mode</li>
+          <li>Tomorrow/Yesterday/Date chooser</li>
+          <li>More readings:
+          <ul>
+            <li>Scrolls -- just link</li>
+            <li>Parashoth - authoritative source for calendar?</li>
+            <li>Epistles</li>
+            <li>History</li>
+            <li>Prophets</li>
+            <li>Kaddish</li>
+            <li>BCP: daily offices</li>
+            <li>BCP: Sunday Eucharist (Rite 2!)</li>
+          </ul></li>
+          <li><a href="lib/lectionary/SpecRunner.html">Tests</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div data-role="page" id="psmorningPage">
+      <div data-role="header">
+        <h1>Morning Psalms</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="PsMorning"></div>
+      </div>
+    </div>
+
+    <div data-role="page" id="psnoonPage">
+      <div data-role="header">
+        <h1>Noon Psalms</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="PsNoon"></div>
+      </div>
+    </div>
+
+    <div data-role="page" id="pseveningPage">
+      <div data-role="header">
+        <h1>Evening Psalms</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="PsEvening"></div>
+      </div>
+    </div>
+
+    <div data-role="page" id="gospelPage">
+      <div data-role="header">
+        <h1>Gospel</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="Gospel"></div>
+      </div>
+    </div>
+
+    <div data-role="page" id="proverbsPage">
+      <div data-role="header">
+        <h1>Proverbs</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="proverbs"></div>
+      </div>
+    </div>
+
+
+
+  </div>
+  </body>
+</html>

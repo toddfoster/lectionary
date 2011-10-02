@@ -1,0 +1,241 @@
+<html>
+  <head>
+    <title>Todd's Lectionary</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.min.css" />
+    <script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/lectionary.css">	
+    <link rel="stylesheet" type="text/css" href="http://www.gnpcb.org/esv/assets/style/text.css" />
+
+    <script type="text/javascript" src="lib/lectionary/lectionary.js" /></script>	
+    <script type="text/javascript">
+        function main() {
+            var date = new Date();
+            var lectionary = new Lectionary(date);
+            display("ReadingsDate", "Readings for " + date.toDateString());
+    display("Summary", "<strong>Summary:</strong> " + lectionary.psalms() + ", " + lectionary.gospel() + ", " + lectionary.proverbs());
+            displayEsv("PsMorning", lectionary.psalmsAm());
+            displayEsv("PsNoon", lectionary.psalmsNoon());
+            displayEsv("PsEvening", lectionary.psalmsPm());
+            displayEsv("Gospel", lectionary.gospel());
+            displayEsv("Proverbs", lectionary.proverbs());
+        }
+
+        function display(id, content) {
+                var node = document.getElementById(id);
+                node.innerHTML = content;
+        }
+
+        function debug(content) {
+            var node = document.getElementById("Debug");
+            node.appendChild(document.createTextNode(content));
+        }
+
+        function displayEsv(destinationDiv, passage) {
+            // Bypass security to allow cross-domain get
+            // netscape.security.PrivilegeManager.enablePrivilege('UniversalBrowserRead');
+            passage = passage.replace(" ", "");
+            var myUrl = "http://www.boidem.org/cgi/esv/passageQuery.py?include-verse-numbers=0&include-first-verse-numbers=0&include-footnotes=0&include-surrounding-chapters=0&audio-format=mp3&include-headings=false&passage=" + passage;
+            // var myUrl = "http://www.boidem.org/cgi/esv/passageQuery.py?passage=" + passage;
+          getUrl(myUrl, function (text) { display(destinationDiv, text); }); 
+        }
+
+        function getUrl(url, callBackFn) {
+            var xmlhttp = null;
+          if (window.XMLHttpRequest) 
+              xmlhttp=new XMLHttpRequest();
+          else // for IE6, IE5
+             xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+          xmlhttp.open("GET", url, true);
+          xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState==4 && xmlhttp.status == 200)
+             callBackFn(xmlhttp.responseText);
+          };
+          xmlhttp.send(null);
+        }
+
+        function toggleDiv(divid) { if(document.getElementById(divid).style.display == 'none')
+            document.getElementById(divid).style.display = 'block';
+          else
+            document.getElementById(divid).style.display = 'none';
+        }
+
+        //window.onload=main;
+
+    </script>
+  </head>
+  <body>
+    <div data-role="page" id="home">
+      <div data-role="header">
+        <h1>Todd's Lectionary</h1>
+      </div>
+      <div data-role="content">
+        <h3 id="ReadingsDate"></h3>
+        <div id="Summary"></div>
+        <ul data-role="listview" data-inset="true">
+          <li><a href="#psmorning">Morning Psalms</a></li>
+          <li><a href="#psnoon">Noon Psalms</a></li>
+          <li><a href="#psevening">Evening Psalms</a></li>
+          <li><a href="#gospel">Gospel</a></li>
+          <li><a href="#proverbs">Proverbs</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#notes">Notes</a></li>
+        </ul>
+      </div>
+      <div data-role="footer">
+        <p>
+        Scripture taken from The Holy Bible, English Standard Version. Copyright &copy;2001 by <a href="http://www.crosswaybibles.org">Crossway Bibles</a>, a publishing ministry of Good News Publishers. Used by permission. All rights reserved. Text provided by the <a href="http://www.gnpcb.org/esv/share/services/">Crossway Bibles Web Service</a>.
+        <p>Page copyright &copy;2011 by Todd Foster. Last update on 29 January 2011.</p>
+      </div>
+    </div>
+
+    
+    <div data-role="page" id="about">
+      <div data-role="header">
+        <h1>About this app</h1>
+      </div>
+      <div data-role="content">
+			<p>Psalms reading plan adapted from Rabbi Menachem Davis, ed.,
+			<em>Tehillim</em> (<a href="http://artscroll.com/">Mesorah 
+				Publications, Ltd.</a>: 2001).
+			</p>
+			<p>Kudos to <a href="http://www.crossway.org/home/esv/">Crossway 
+				Bibles</a> for providing a simple, easy and free
+				<a href="http://www.esvapi.org/">Javascript API</a> to their Bible.
+				I also very much like their 
+				<a href="http://www.gnpcb.org/esv/mobile/">clean mobile interface</a>
+				(e.g., <a href="http://www.gnpcb.org/esv/mobile/?q=Ps+130">Ps 130</a>).
+			</p>
+			<form action="http://www.gnpcb.org/esv/search/" id="esvsearchform" method="get">
+				<label for="esvinput">Search the ESV Bible</label>
+				<input type="text" name="q" id="esvinput" size="20" maxlength="255" />
+				<input type="submit" name="go" id="esvsearchbutton" value="Search" />
+				</p>
+			</form>
+
+            <p>If you don't mind a little heavier interface, <a href="http://www.logos.com">my
+              employer</a> provides <a href="http://biblia.com">a more comprehensive
+              tool</a>: be sure to click on the "View: mobile" link at the bottom 
+              for a nice clean interface (my preference!). Or search here:
+              </p>
+          
+	<style type="text/css">
+  <!-- #lbxSmallSearchContainer {width:145px;height:50px;background:url(http://www.logos.com/images/biblesearchbar/smallbg.gif) 
+
+  no-repeat;font:Arial, Helvetica, sans-serif normal #333;line-height:100%;}
+  #lbxSmallSearchField {padding: 3px 2px 0px;height: 27px;}
+  #lbxSmallSearchContainer form {border:none;margin: 0;padding: 0;}
+  #lbxSmallSearchContainer input {background:white;width:98px;border:0;text-align: left;margin: 0px 0px 2px 
+
+  7px;font-size:12px;position:relative;top:-6px;left:1px;}
+  #lbxSmallSearchContainer #go {width: 18px;cursor: pointer;border: 0;margin-top:7px;position:relative;top:0px;}
+  #lbxSmallSearchFooter {text-align:center;color:#FFF;font-size:9px;font-family:Arial, Helvetica, sans-serif;margin-top:4px;}
+  #lbxSmallSearchFooter a img {vertical-align:baseline;padding:0; padding-right:2px;margin:0;}
+  #lbxSmallSearchFooter a {color:#FFF;text-decoration:none;font-size:9px;}
+  a.lbxSmallSearchTooltip {display:inline;cursor:pointer;position:relative;z-index:24;}
+  a.lbxSmallSearchTooltip:hover {z-index:25}
+  a.lbxSmallSearchTooltip span {display: none;}
+  a.lbxSmallSearchTooltip:hover span {position: absolute;margin:15px 0px 0px 
+
+  0px;background-color:#FFF;width:195px;height:88px;cursor:pointer;background: 
+
+  url(http://www.logos.com/images/biblesearchbar/tooltip.jpg) no-repeat;display:block;top:.5em;left:.5em;}
+  .lbxBlurred {color: #666666;}
+  -->
+  </style>
+  <div id="lbxSmallSearchContainer">
+    <div id="lbxSmallSearchField">
+      <form action="http://bible.logos.com/search/" id="lbxSmallSearchForm">
+        <input name="query" type="text" id="lbxSearchQuery" class="lbxBlurred" onClick="this.value=''" value="Search the Bible"	/>
+        <input type="image" id="go" value=" " src="http://www.logos.com/images/biblesearchbar/LBSbug.gif"/>
+      </form>
+    </div>
+    <div id="lbxSmallSearchFooter">
+      <a class="lbxSmallSearchTooltip" href="#"><img src="http://www.logos.com/images/biblesearchbar/info.gif" alt="info" 
+
+  border="0" /><span> </span></a>
+      <a href="http://bible.logos.com">Online Bible</a> by <a href="http://www.logos.com/demo?biblesearchbox">Logos</a></div>
+    <br />
+  <script type="text/javascript" src="http://www.logos.com/media/Scripts/BibleSearchBar.js"></script>
+  </div>
+      </div>
+
+    <div data-role="page" id="notes">
+      <div data-role="header">
+        <h1>Notes/Todo</h1>
+      </div>
+      <div data-role="content">
+        <p> Some ideas:</p>
+        <ul>
+          <li>Folder tabs instead of collapsing div's?</li>
+          <li>Add check-boxes to toggle options sent to esvapi</li>
+          <li>Weekly mode</li>
+          <li>Tomorrow/Yesterday/Date chooser</li>
+          <li>More readings:
+          <ul>
+            <li>Scrolls -- just link</li>
+            <li>Parashoth - authoritative source for calendar?</li>
+            <li>Epistles</li>
+            <li>History</li>
+            <li>Prophets</li>
+            <li>Kaddish</li>
+            <li>BCP: daily offices</li>
+            <li>BCP: Sunday Eucharist (Rite 2!)</li>
+          </ul></li>
+          <li><a href="lib/lectionary/SpecRunner.html">Tests</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div data-role="page" id="psmorning">
+      <div data-role="header">
+        <h1>Morning Psalms</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="PsMorning"/>
+      </div>
+    </div>
+
+    <div data-role="page" id="psnoon">
+      <div data-role="header">
+        <h1>Noon Psalms</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="PsNoon"/>
+      </div>
+    </div>
+
+    <div data-role="page" id="psevening">
+      <div data-role="header">
+        <h1>Evening Psalms</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="PsEvening"/>
+      </div>
+    </div>
+
+    <div data-role="page" id="gospel">
+      <div data-role="header">
+        <h1>Gospel</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="Gospel"/>
+      </div>
+    </div>
+
+    <div data-role="page" id="proverbs">
+      <div data-role="header">
+        <h1>Proverbs</h1>
+      </div>
+      <div data-role="content">
+        <div class="Passage" id="proverbs"/>
+      </div>
+    </div>
+
+
+
+  </div>
+  </body>
+</html>
